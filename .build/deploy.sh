@@ -26,6 +26,6 @@ echo "📦 Publishing..."
 
 ./gradlew build
 ./gradlew generateChangelog github
-./gradlew publishMavenJavaPublicationToMavenCentralRepository -Psign closeAndReleaseRepository
+./gradlew publishMavenJavaPublicationToMavenCentralRepository -Psign # closeAndReleaseRepository
 
 echo "✅ Done!"
