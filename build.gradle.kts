@@ -93,10 +93,6 @@ tasks.create<org.gradle.jvm.tasks.Jar>("javadocJar") {
 	dependsOn(tasks.findByName("javadoc"))
 }
 
-//artifacts {
-//	archives(tasks.withType<org.gradle.jvm.tasks.Jar>().flatMap { task -> task.outputs.files })
-//}
-
 publishing {
 	publications {
 		create<MavenPublication>("mavenJava") {
@@ -138,12 +134,12 @@ publishing {
 
 	repositories {
 		val ossrhUsername = "OroArmor"
-		val ossrhPassword = (if(project.hasProperty("ossrhPassword")) project.property("ossrhPassword") else System.getenv("OSSRH_PASSWORD")) as String
+		val ossrhPassword = (if (project.hasProperty("ossrhPassword")) project.property("ossrhPassword") else System.getenv("OSSRH_PASSWORD")) as String?
 		mavenLocal()
 		maven {
 			val releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
 			val snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
-			url = uri(if((version as String).endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl)
+			url = uri(if ((version as String).endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl)
 			credentials {
 				username = ossrhUsername
 				password = ossrhPassword
@@ -165,8 +161,8 @@ tasks.create("github") {
 	}
 
 	doLast {
-		val github = org.kohsuke.github.GitHub.connectUsingOAuth(System.getenv()["GITHUB_TOKEN"] as String)
-		val repository = github.getRepository ("Blaze4D-MC/Aftermath")
+		val github = org.kohsuke.github.GitHub.connectUsingOAuth(System.getenv()["GITHUB_TOKEN"])
+		val repository = github.getRepository("Blaze4D-MC/Aftermath")
 
 		val releaseBuilder = org.kohsuke.github.GHReleaseBuilder(repository, project.version as String?)
 		releaseBuilder.name("Aftermath ${project.version}")
