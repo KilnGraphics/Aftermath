@@ -127,7 +127,7 @@ publishing {
 					username = System.getenv("MAVEN_USERNAME")
 					password = System.getenv("MAVEN_PASSWORD")
 				}
-				name = "OroArmor Maven"
+				name = "OroArmorMaven"
 			}
 		}
 	}
@@ -155,7 +155,7 @@ tasks.create("github") {
 
 tasks.create("generateChangelog") {
 	val changelogFile = file("CHANGELOG.md")
-	val changelogs = changelogFile.readLines()
+	val changelogs = changelogFile.readText().split("----")
 	changelog = changelogs.find { log -> log.contains(project.version as String) }!!
 	println(changelog)
 }
