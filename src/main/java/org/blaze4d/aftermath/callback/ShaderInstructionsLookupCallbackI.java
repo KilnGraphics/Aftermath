@@ -22,9 +22,9 @@
  * SOFTWARE.
  */
 
-package com.oroarmor.aftermath.callback;
+package org.blaze4d.aftermath.callback;
 
-import com.oroarmor.aftermath.AftermathCallbackCreationHelper;
+import org.blaze4d.aftermath.AftermathCallbackCreationHelper;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.system.APIUtil;
 import org.lwjgl.system.CallbackI;
@@ -35,11 +35,11 @@ import org.lwjgl.system.libffi.LibFFI;
 import java.nio.ByteBuffer;
 import java.util.function.BiFunction;
 
-import static org.lwjgl.system.MemoryUtil.*;
+import static org.lwjgl.system.MemoryUtil.memGetAddress;
+import static org.lwjgl.system.MemoryUtil.memGetLong;
 import static org.lwjgl.system.libffi.LibFFI.*;
-import static org.lwjgl.system.libffi.LibFFI.ffi_type_pointer;
 
-public interface ShaderDebugInfoLookupCallbackI extends CallbackI {
+public interface ShaderInstructionsLookupCallbackI extends CallbackI {
     FFICIF CIF = APIUtil.apiCreateCIF(
             LibFFI.FFI_DEFAULT_ABI,
             ffi_type_void,
@@ -55,17 +55,11 @@ public interface ShaderDebugInfoLookupCallbackI extends CallbackI {
     @Override
     default void callback(long ret, long args) {
         invoke(
-                new long[]{
-                        memGetLong(memGetAddress(args)),
-                        memGetLong(memGetAddress(args + POINTER_SIZE))
-                },
-                AftermathCallbackCreationHelper.createSetShaderDebugInfo(memGetLong(memGetAddress(args + 2L * POINTER_SIZE))),
-                memGetAddress(memGetAddress(args + 3L * POINTER_SIZE))
+                memGetLong(memGetAddress(args)),
+                AftermathCallbackCreationHelper.createSetShaderDebugInfo(memGetLong(memGetAddress(args + POINTER_SIZE))),
+                memGetAddress(memGetAddress(args + 2L * POINTER_SIZE))
         );
     }
 
-    /**
-     * @param pIdentifier        The length of the array is always 2
-     */
-    void invoke(@NativeType("GFSDK_Aftermath_ShaderDebugInfoIdentifier *") long[] pIdentifier, @NativeType("PFN_GFSDK_Aftermath_SetData") BiFunction<ByteBuffer, Integer, Integer> setShaderDebugInfo, @NativeType("void *") long pUserData);
+    void invoke(@NativeType("GFSDK_Aftermath_ShaderInstructionsHash *") long pShaderInstructionsHash, @NativeType("PFN_GFSDK_Aftermath_SetData") BiFunction<ByteBuffer, Integer, Integer> setShaderBinary, @NativeType("void *") long pUserData);
 }

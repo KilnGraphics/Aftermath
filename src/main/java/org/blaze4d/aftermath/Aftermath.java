@@ -22,10 +22,16 @@
  * SOFTWARE.
  */
 
-package com.oroarmor.aftermath;
+package org.blaze4d.aftermath;
 
-import com.oroarmor.aftermath.callback.*;
-import com.oroarmor.aftermath.struct.GFSDK_Aftermath_GpuCrashDump_BaseInfo;
+import org.blaze4d.aftermath.callback.GPUCrashDumpCallbackI;
+import org.blaze4d.aftermath.callback.GpuCrashDumpDescriptionCallbackI;
+import org.blaze4d.aftermath.callback.ShaderDebugInfoCallbackI;
+import org.blaze4d.aftermath.callback.ShaderDebugInfoLookupCallbackI;
+import org.blaze4d.aftermath.callback.ShaderInstructionsLookupCallbackI;
+import org.blaze4d.aftermath.callback.ShaderLookupCallbackI;
+import org.blaze4d.aftermath.callback.ShaderSourceDebugInfoLookupCallbackI;
+import org.blaze4d.aftermath.struct.GFSDK_Aftermath_GpuCrashDump_BaseInfo;
 import org.lwjgl.system.*;
 import org.lwjgl.system.jni.JNINativeInterface;
 

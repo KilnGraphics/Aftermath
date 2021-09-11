@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.oroarmor.aftermath.callback;
+package org.blaze4d.aftermath.callback;
 
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.system.Callback;
@@ -33,45 +33,45 @@ import java.util.function.BiFunction;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 
-public abstract class ShaderLookupCallback extends Callback implements ShaderLookupCallbackI {
-    public static ShaderLookupCallback create(long functionPointer) {
-        ShaderLookupCallbackI instance = Callback.get(functionPointer);
-        return instance instanceof ShaderLookupCallback
-                ? (ShaderLookupCallback) instance
+public abstract class ShaderDebugInfoLookupCallback extends Callback implements ShaderDebugInfoLookupCallbackI {
+    public static ShaderDebugInfoLookupCallback create(long functionPointer) {
+        ShaderDebugInfoLookupCallbackI instance = Callback.get(functionPointer);
+        return instance instanceof ShaderDebugInfoLookupCallback
+                ? (ShaderDebugInfoLookupCallback) instance
                 : new Container(functionPointer, instance);
     }
 
     @Nullable
-    public static ShaderLookupCallback createSafe(long functionPointer) {
+    public static ShaderDebugInfoLookupCallback createSafe(long functionPointer) {
         return functionPointer == NULL ? null : create(functionPointer);
     }
 
-    public static ShaderLookupCallback create(ShaderLookupCallbackI instance) {
-        return instance instanceof ShaderLookupCallback
-                ? (ShaderLookupCallback)instance
+    public static ShaderDebugInfoLookupCallback create(ShaderDebugInfoLookupCallbackI instance) {
+        return instance instanceof ShaderDebugInfoLookupCallback
+                ? (ShaderDebugInfoLookupCallback)instance
                 : new Container(instance.address(), instance);
     }
 
-    protected ShaderLookupCallback() {
+    protected ShaderDebugInfoLookupCallback() {
         super(CIF);
     }
 
-    ShaderLookupCallback(long functionPointer) {
+    ShaderDebugInfoLookupCallback(long functionPointer) {
         super(functionPointer);
     }
 
-    private static final class Container extends ShaderLookupCallback {
-        private final ShaderLookupCallbackI delegate;
+    private static final class Container extends ShaderDebugInfoLookupCallback {
+        private final ShaderDebugInfoLookupCallbackI delegate;
 
-        Container(long functionPointer, ShaderLookupCallbackI delegate) {
+        Container(long functionPointer, ShaderDebugInfoLookupCallbackI delegate) {
             super(functionPointer);
             this.delegate = delegate;
         }
 
 
         @Override
-        public void invoke(long shaderHash, BiFunction<ByteBuffer, Integer, Integer> setShaderBinary, long pUserData) {
-            delegate.invoke(shaderHash, setShaderBinary, pUserData);
+        public void invoke(long[] pIdentifier, BiFunction<ByteBuffer, Integer, Integer> setShaderDebugInfo, long pUserData) {
+            delegate.invoke(pIdentifier, setShaderDebugInfo, pUserData);
         }
     }
 }

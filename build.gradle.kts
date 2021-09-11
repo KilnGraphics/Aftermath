@@ -8,17 +8,14 @@ buildscript {
 	}
 	dependencies {
 		classpath("org.kohsuke:github-api:1.114")
-		classpath("io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0")
 	}
 }
 
 plugins {
 	`java-library`
 	`maven-publish`
-	id("org.cadixdev.licenser") version "0.5.0"
-	signing
+	id("org.cadixdev.licenser") version "0.6.1"
 }
-apply(null, "io.codearte.nexus-staging")
 
 group = properties["maven_group"]!!
 version = properties["version"]!!
@@ -55,7 +52,7 @@ dependencies {
 	implementation("org.lwjgl", "lwjgl")
 	runtimeOnly("org.lwjgl", "lwjgl", classifier = lwjglNatives)
 
-	implementation("org.jetbrains", "annotations", "20.1.0")
+	api("org.jetbrains", "annotations", "20.1.0")
 }
 
 var changelog = ""
@@ -65,10 +62,6 @@ java {
 }
 
 tasks {
-	withType<Sign> {
-		onlyIf { project.hasProperty("sign") }
-	}
-
 	withType<Jar> {
 		from("LICENSE") {
 			rename { "${it}_${project.properties["archives_base_name"]!!}" }
@@ -76,15 +69,8 @@ tasks {
 	}
 }
 
-if (project.hasProperty("sign")) {
-	signing {
-		useGpgCmd()
-		sign(publishing.publications)
-	}
-}
-
 license {
-	header = rootProject.file("LICENSE")
+	setHeader(rootProject.file("LICENSE"))
 }
 
 tasks.create<org.gradle.jvm.tasks.Jar>("javadocJar") {
@@ -101,7 +87,7 @@ publishing {
 			artifact(tasks.findByName("javadocJar"))
 
 			pom {
-				name.set("Multi Item Lib")
+				name.set("Aftermath")
 				packaging = "jar"
 				// optionally artifactId can be defined here
 				description.set("A JNI Library for the Nvidia Aftermath debugger")
@@ -133,27 +119,20 @@ publishing {
 	}
 
 	repositories {
-		val ossrhUsername = "OroArmor"
-		val ossrhPassword = (if (project.hasProperty("ossrhPassword")) project.property("ossrhPassword") else System.getenv("OSSRH_PASSWORD")) as String?
 		mavenLocal()
-		maven {
-			val releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-			val snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
-			url = uri(if ((version as String).endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl)
-			credentials {
-				username = ossrhUsername
-				password = ossrhPassword
+		if (System.getenv("MAVEN_URL") != null) {
+			maven {
+				setUrl(System.getenv("MAVEN_URL"))
+				credentials {
+					username = System.getenv("MAVEN_USERNAME")
+					password = System.getenv("MAVEN_PASSWORD")
+				}
+				name = "OroArmor Maven"
 			}
-			name = "mavenCentral"
 		}
 	}
 }
 
-
-//nexusStaging {
-//	username = "OroArmor"
-//	password = (if(project.hasProperty("ossrhPassword")) project.property("ossrhPassword") else System.getenv("OSSRH_PASSWORD")) as String
-//}
 
 tasks.create("github") {
 	onlyIf {

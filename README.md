@@ -7,9 +7,11 @@ This library is a Java library intended to be used within a LWJGL project as a w
 ## Use
 
 ### Gradle
-Add ``implementation "com.oroarmor:aftermath:${aftermath_version}`` to the dependencies section of your ``build.gradle`` file.
+Add ``maven { url = "https://maven.oroarmor.com" }`` to the maven section of your ``build.gradle`` file.
 
-If using the Kotlin DSL, ``implementation("com.oroarmor:aftermath:${aftermath_version})`` to the dependencies section of your ``build.gradle.kts`` file will work.
+Add ``implementation "org.blaze4d:aftermath:${aftermath_version}`` to the dependencies section of your ``build.gradle`` file.
+
+If using the Kotlin DSL, ``implementation("org.blaze4d:aftermath:${aftermath_version})`` to the dependencies section of your ``build.gradle.kts`` file will work.
 
 
 ## Building

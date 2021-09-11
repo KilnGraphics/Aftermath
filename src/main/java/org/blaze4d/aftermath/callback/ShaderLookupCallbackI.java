@@ -22,9 +22,9 @@
  * SOFTWARE.
  */
 
-package com.oroarmor.aftermath.callback;
+package org.blaze4d.aftermath.callback;
 
-import com.oroarmor.aftermath.AftermathCallbackCreationHelper;
+import org.blaze4d.aftermath.AftermathCallbackCreationHelper;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.system.APIUtil;
 import org.lwjgl.system.CallbackI;
@@ -39,7 +39,7 @@ import static org.lwjgl.system.MemoryUtil.memGetAddress;
 import static org.lwjgl.system.MemoryUtil.memGetLong;
 import static org.lwjgl.system.libffi.LibFFI.*;
 
-public interface ShaderInstructionsLookupCallbackI extends CallbackI {
+public interface ShaderLookupCallbackI extends CallbackI {
     FFICIF CIF = APIUtil.apiCreateCIF(
             LibFFI.FFI_DEFAULT_ABI,
             ffi_type_void,
@@ -61,5 +61,5 @@ public interface ShaderInstructionsLookupCallbackI extends CallbackI {
         );
     }
 
-    void invoke(@NativeType("GFSDK_Aftermath_ShaderInstructionsHash *") long pShaderInstructionsHash, @NativeType("PFN_GFSDK_Aftermath_SetData") BiFunction<ByteBuffer, Integer, Integer> setShaderBinary, @NativeType("void *") long pUserData);
+    void invoke(@NativeType("GFSDK_Aftermath_ShaderHash&") long shaderHash, @NativeType("PFN_GFSDK_Aftermath_SetData") BiFunction<ByteBuffer, Integer, Integer> setShaderBinary, @NativeType("void *") long pUserData);
 }

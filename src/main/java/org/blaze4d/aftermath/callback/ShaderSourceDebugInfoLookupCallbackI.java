@@ -22,12 +22,13 @@
  * SOFTWARE.
  */
 
-package com.oroarmor.aftermath.callback;
+package org.blaze4d.aftermath.callback;
 
-import com.oroarmor.aftermath.AftermathCallbackCreationHelper;
+import org.blaze4d.aftermath.AftermathCallbackCreationHelper;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.system.APIUtil;
 import org.lwjgl.system.CallbackI;
+import org.lwjgl.system.MemoryUtil;
 import org.lwjgl.system.NativeType;
 import org.lwjgl.system.libffi.FFICIF;
 import org.lwjgl.system.libffi.LibFFI;
@@ -39,7 +40,7 @@ import static org.lwjgl.system.MemoryUtil.memGetAddress;
 import static org.lwjgl.system.MemoryUtil.memGetLong;
 import static org.lwjgl.system.libffi.LibFFI.*;
 
-public interface ShaderLookupCallbackI extends CallbackI {
+public interface ShaderSourceDebugInfoLookupCallbackI extends CallbackI {
     FFICIF CIF = APIUtil.apiCreateCIF(
             LibFFI.FFI_DEFAULT_ABI,
             ffi_type_void,
@@ -55,11 +56,11 @@ public interface ShaderLookupCallbackI extends CallbackI {
     @Override
     default void callback(long ret, long args) {
         invoke(
-                memGetLong(memGetAddress(args)),
+                MemoryUtil.memUTF8(memGetLong(memGetAddress(args)), 128),
                 AftermathCallbackCreationHelper.createSetShaderDebugInfo(memGetLong(memGetAddress(args + POINTER_SIZE))),
                 memGetAddress(memGetAddress(args + 2L * POINTER_SIZE))
         );
     }
 
-    void invoke(@NativeType("GFSDK_Aftermath_ShaderHash&") long shaderHash, @NativeType("PFN_GFSDK_Aftermath_SetData") BiFunction<ByteBuffer, Integer, Integer> setShaderBinary, @NativeType("void *") long pUserData);
+    void invoke(@NativeType("GFSDK_Aftermath_ShaderHash *") String shaderDebugName, @NativeType("PFN_GFSDK_Aftermath_SetData") BiFunction<ByteBuffer, Integer, Integer> setShaderBinary, @NativeType("void *") long pUserData);
 }

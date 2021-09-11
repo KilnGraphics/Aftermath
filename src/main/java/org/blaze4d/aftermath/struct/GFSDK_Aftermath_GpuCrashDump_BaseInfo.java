@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.oroarmor.aftermath.struct;
+package org.blaze4d.aftermath.struct;
 
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.BufferUtils;

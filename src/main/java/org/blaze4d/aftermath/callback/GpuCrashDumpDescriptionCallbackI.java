@@ -22,29 +22,24 @@
  * SOFTWARE.
  */
 
-package com.oroarmor.aftermath.callback;
+package org.blaze4d.aftermath.callback;
 
-import com.oroarmor.aftermath.AftermathCallbackCreationHelper;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.system.APIUtil;
 import org.lwjgl.system.CallbackI;
-import org.lwjgl.system.MemoryUtil;
 import org.lwjgl.system.NativeType;
 import org.lwjgl.system.libffi.FFICIF;
 import org.lwjgl.system.libffi.LibFFI;
 
-import java.nio.ByteBuffer;
-import java.util.function.BiFunction;
-
 import static org.lwjgl.system.MemoryUtil.memGetAddress;
-import static org.lwjgl.system.MemoryUtil.memGetLong;
+import static org.lwjgl.system.MemoryUtil.memGetInt;
 import static org.lwjgl.system.libffi.LibFFI.*;
 
-public interface ShaderSourceDebugInfoLookupCallbackI extends CallbackI {
+public interface GpuCrashDumpDescriptionCallbackI extends CallbackI {
     FFICIF CIF = APIUtil.apiCreateCIF(
             LibFFI.FFI_DEFAULT_ABI,
             ffi_type_void,
-            ffi_type_pointer, ffi_type_uint32, ffi_type_pointer
+            ffi_type_pointer, ffi_type_pointer
     );
 
     @Override
@@ -56,11 +51,10 @@ public interface ShaderSourceDebugInfoLookupCallbackI extends CallbackI {
     @Override
     default void callback(long ret, long args) {
         invoke(
-                MemoryUtil.memUTF8(memGetLong(memGetAddress(args)), 128),
-                AftermathCallbackCreationHelper.createSetShaderDebugInfo(memGetLong(memGetAddress(args + POINTER_SIZE))),
-                memGetAddress(memGetAddress(args + 2L * POINTER_SIZE))
+                memGetAddress(memGetAddress(args)),
+                memGetAddress(memGetAddress(args + POINTER_SIZE))
         );
     }
 
-    void invoke(@NativeType("GFSDK_Aftermath_ShaderHash *") String shaderDebugName, @NativeType("PFN_GFSDK_Aftermath_SetData") BiFunction<ByteBuffer, Integer, Integer> setShaderBinary, @NativeType("void *") long pUserData);
+    void invoke(@NativeType("PFN_GFSDK_Aftermath_GpuCrashDumpDescriptionCb *") long addValue, @NativeType("void *") long pUserData);
 }

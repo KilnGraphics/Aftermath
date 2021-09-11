@@ -22,8 +22,9 @@
  * SOFTWARE.
  */
 
-package com.oroarmor.aftermath.callback;
+package org.blaze4d.aftermath.callback;
 
+import org.blaze4d.aftermath.AftermathCallbackCreationHelper;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.system.APIUtil;
 import org.lwjgl.system.CallbackI;
@@ -31,15 +32,18 @@ import org.lwjgl.system.NativeType;
 import org.lwjgl.system.libffi.FFICIF;
 import org.lwjgl.system.libffi.LibFFI;
 
-import static org.lwjgl.system.MemoryUtil.memGetAddress;
-import static org.lwjgl.system.MemoryUtil.memGetInt;
-import static org.lwjgl.system.libffi.LibFFI.*;
+import java.nio.ByteBuffer;
+import java.util.function.BiFunction;
 
-public interface GpuCrashDumpDescriptionCallbackI extends CallbackI {
+import static org.lwjgl.system.MemoryUtil.*;
+import static org.lwjgl.system.libffi.LibFFI.*;
+import static org.lwjgl.system.libffi.LibFFI.ffi_type_pointer;
+
+public interface ShaderDebugInfoLookupCallbackI extends CallbackI {
     FFICIF CIF = APIUtil.apiCreateCIF(
             LibFFI.FFI_DEFAULT_ABI,
             ffi_type_void,
-            ffi_type_pointer, ffi_type_pointer
+            ffi_type_pointer, ffi_type_uint32, ffi_type_pointer
     );
 
     @Override
@@ -51,10 +55,17 @@ public interface GpuCrashDumpDescriptionCallbackI extends CallbackI {
     @Override
     default void callback(long ret, long args) {
         invoke(
-                memGetAddress(memGetAddress(args)),
-                memGetAddress(memGetAddress(args + POINTER_SIZE))
+                new long[]{
+                        memGetLong(memGetAddress(args)),
+                        memGetLong(memGetAddress(args + POINTER_SIZE))
+                },
+                AftermathCallbackCreationHelper.createSetShaderDebugInfo(memGetLong(memGetAddress(args + 2L * POINTER_SIZE))),
+                memGetAddress(memGetAddress(args + 3L * POINTER_SIZE))
         );
     }
 
-    void invoke(@NativeType("PFN_GFSDK_Aftermath_GpuCrashDumpDescriptionCb *") long addValue, @NativeType("void *") long pUserData);
+    /**
+     * @param pIdentifier        The length of the array is always 2
+     */
+    void invoke(@NativeType("GFSDK_Aftermath_ShaderDebugInfoIdentifier *") long[] pIdentifier, @NativeType("PFN_GFSDK_Aftermath_SetData") BiFunction<ByteBuffer, Integer, Integer> setShaderDebugInfo, @NativeType("void *") long pUserData);
 }

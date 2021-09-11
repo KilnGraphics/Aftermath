@@ -22,40 +22,21 @@
  * SOFTWARE.
  */
 
-package com.oroarmor.aftermath.callback;
+package org.blaze4d.aftermath;
 
-import org.jetbrains.annotations.NotNull;
-import org.lwjgl.system.APIUtil;
-import org.lwjgl.system.CallbackI;
-import org.lwjgl.system.NativeType;
-import org.lwjgl.system.libffi.FFICIF;
-import org.lwjgl.system.libffi.LibFFI;
+import org.lwjgl.system.JNI;
+import org.lwjgl.system.MemoryUtil;
 
-import static org.lwjgl.system.MemoryUtil.memGetAddress;
-import static org.lwjgl.system.MemoryUtil.memGetInt;
-import static org.lwjgl.system.libffi.LibFFI.*;
+import java.nio.ByteBuffer;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 
-public interface ShaderDebugInfoCallbackI extends CallbackI {
-    FFICIF CIF = APIUtil.apiCreateCIF(
-            LibFFI.FFI_DEFAULT_ABI,
-            ffi_type_void,
-            ffi_type_pointer, ffi_type_uint32, ffi_type_pointer
-    );
+public abstract class AftermathCallbackCreationHelper {
+   public static BiConsumer<Integer, String> createAddGpuCrashDumpDescription(long address) {
+       return (integer, s) -> JNI.invokePPV(integer, MemoryUtil.memAddress(MemoryUtil.memUTF8(s, true)), address);
+   }
 
-    @Override
-    @NotNull
-    default FFICIF getCallInterface() {
-        return CIF;
+    public static BiFunction<ByteBuffer, Integer, Integer> createSetShaderDebugInfo(long setShaderDebugInfo) {
+        return (bytes, length) -> JNI.callPPI(MemoryUtil.memAddress(bytes), length, setShaderDebugInfo);
     }
-
-    @Override
-    default void callback(long ret, long args) {
-        invoke(
-                memGetAddress(memGetAddress(args)),
-                memGetInt(memGetAddress(args + POINTER_SIZE)),
-                memGetAddress(memGetAddress(args + 2L * POINTER_SIZE))
-        );
-    }
-
-    void invoke(@NativeType("void *") long pShaderDebugInfo, int shaderDebugInfoSize, @NativeType("void *") long pUserData);
 }
